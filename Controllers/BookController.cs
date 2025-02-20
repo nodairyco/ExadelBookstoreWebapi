@@ -1,0 +1,79 @@
+using ExadelBookstoreAPI.Models;
+using ExadelBookstoreAPI.Service;
+using Microsoft.AspNetCore.Mvc;
+
+namespace ExadelBookstoreAPI.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class BookController(BookStoreService bookStoreService) : ControllerBase
+{
+    private readonly BookStoreService _bookStoreService = bookStoreService;
+
+    [HttpGet("/getEveryBook", Name = "GetEveryBook")]
+    public ActionResult<List<Book>> GetBooks()
+    {
+        return Ok(_bookStoreService.GetAllAsync().Result);
+    }
+
+    
+    [HttpGet("/getBookByTitle/{title}", Name = "GetBookByTitle")]
+    public ActionResult<Book> GetBookByTitle(string title)
+    {
+        Book? book = _bookStoreService.GetByTitleAsync(title).Result;
+        if (book is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(book);
+    }
+    
+    [HttpPost("/addBook", Name = "AddBookToDatabase")]
+    public ActionResult<Book> AddBook(Book newBook)
+    {
+        // check if the request body is empty
+        if (newBook is null)
+            return BadRequest();
+        
+        // check if the new book's title is already in the repo
+        if (_bookStoreService.GetByTitleAsync(newBook.title).Result is not null)
+            return BadRequest();
+        
+        _ = _bookStoreService.CreateBookAsync(newBook);
+
+        return CreatedAtAction(nameof(GetBookByTitle), new {newBook.title}, newBook);
+    }
+
+    [HttpPut("/updateBook/{title}", Name = "UpdateBookByTitle")]
+    public IActionResult UpdateBook(string title, Book updatedBook)
+    {
+        var bookToUpdate = _bookStoreService.GetByTitleAsync(title).Result;
+        
+        //check that book with given title exists
+        if (bookToUpdate is null) 
+            return NotFound();
+        
+        //check that updated book isn't null and that it doesn't conflict with any existing books
+        if (updatedBook is null || _bookStoreService.GetByTitleAsync(updatedBook.title).Result is not null)
+            return BadRequest();
+
+        bookToUpdate.title = updatedBook.title;
+        bookToUpdate.authorName = updatedBook.authorName;
+        bookToUpdate.publicationYear = updatedBook.publicationYear;
+        bookToUpdate.viewCount = updatedBook.viewCount;
+
+        return NoContent();
+    }
+
+    [HttpDelete("/deleteByTitle/{title}", Name = "DeleteBookByTitle")]
+    public IActionResult DeleteBookByTitle(string title)
+    {
+        if (_bookStoreService.GetByTitleAsync(title).Result is null)
+            return NotFound();
+
+        _ = _bookStoreService.DeleteByTitleAsync(title);
+
+        return NoContent();
+    }
+}

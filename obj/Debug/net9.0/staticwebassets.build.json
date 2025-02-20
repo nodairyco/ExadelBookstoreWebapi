@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "MfHLotuyd+iYGXRu6gxVq8JcfrlpN2vw8XMW2wugggE=",
+  "Source": "ExadelBookstoreAPI",
+  "BasePath": "_content/ExadelBookstoreAPI",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}
