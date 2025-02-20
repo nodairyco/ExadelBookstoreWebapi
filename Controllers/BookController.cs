@@ -16,7 +16,7 @@ public class BookController(BookStoreService bookStoreService) : ControllerBase
         return Ok(_bookStoreService.GetAllAsync().Result);
     }
 
-    [HttpGet("/getBookPopularity{title}")]
+    [HttpGet("/getBookPopularity/{title}")]
     public ActionResult<float> GetBookPopularity(string title)
     {
         var book = GetBookFromResult(title);
@@ -46,25 +46,25 @@ public class BookController(BookStoreService bookStoreService) : ControllerBase
             return BadRequest();
         
         // check if the new book's title is already in the repo
-        if (_bookStoreService.GetByTitleAsync(newBook.title).Result is not null)
+        if (DoesBookExist(newBook.title))
             return BadRequest();
         
         _ = _bookStoreService.CreateBookAsync(newBook);
 
         return CreatedAtAction(nameof(GetBookByTitle), new {newBook.title}, newBook);
     }
-
+    
     [HttpPut("/updateBook/{title}", Name = "UpdateBookByTitle")]
     public IActionResult UpdateBook(string title, Book updatedBook)
     {
-        var bookToUpdate = _bookStoreService.GetByTitleAsync(title).Result;
+        var bookToUpdate = GetBookFromResult(title);
         
         //check that book with given title exists
         if (bookToUpdate is null) 
             return NotFound();
         
         //check that updated book isn't null and that it doesn't conflict with any existing books
-        if (updatedBook is null || _bookStoreService.GetByTitleAsync(updatedBook.title).Result is not null)
+        if (updatedBook is null || DoesBookExist(title))
             return BadRequest();
 
         bookToUpdate.title = updatedBook.title;
@@ -78,13 +78,16 @@ public class BookController(BookStoreService bookStoreService) : ControllerBase
     [HttpDelete("/deleteByTitle/{title}", Name = "DeleteBookByTitle")]
     public IActionResult DeleteBookByTitle(string title)
     {
-        if (_bookStoreService.GetByTitleAsync(title).Result is null)
+        if (DoesBookExist(title)) 
             return NotFound();
 
         _ = _bookStoreService.DeleteByTitleAsync(title);
 
         return NoContent();
     }
+    private bool DoesBookExist(string title) 
+        => _bookStoreService.GetByTitleAsync(title).Result is not null;
+
     private Book? GetBookFromResult(string title)
         => _bookStoreService.GetByTitleAsync(title).Result;
 }
