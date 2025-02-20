@@ -16,11 +16,20 @@ public class BookController(BookStoreService bookStoreService) : ControllerBase
         return Ok(_bookStoreService.GetAllAsync().Result);
     }
 
+    [HttpGet("/getBookPopularity{title}")]
+    public ActionResult<float> GetBookPopularity(string title)
+    {
+        var book = GetBookFromResult(title);
+        if (book is null)
+            return NotFound();
+
+        return Ok(book.GetPopularity());
+    }
     
     [HttpGet("/getBookByTitle/{title}", Name = "GetBookByTitle")]
     public ActionResult<Book> GetBookByTitle(string title)
     {
-        Book? book = _bookStoreService.GetByTitleAsync(title).Result;
+        var book = GetBookFromResult(title);
         if (book is null)
         {
             return NotFound();
@@ -76,4 +85,6 @@ public class BookController(BookStoreService bookStoreService) : ControllerBase
 
         return NoContent();
     }
+    private Book? GetBookFromResult(string title)
+        => _bookStoreService.GetByTitleAsync(title).Result;
 }
