@@ -41,3 +41,4 @@
 /home/nodariko/Desktop/CSharp/ExadelBookstoreAPI/bin/Debug/net9.0/Swashbuckle.AspNetCore.Swagger.dll
 /home/nodariko/Desktop/CSharp/ExadelBookstoreAPI/bin/Debug/net9.0/Swashbuckle.AspNetCore.SwaggerGen.dll
 /home/nodariko/Desktop/CSharp/ExadelBookstoreAPI/bin/Debug/net9.0/Swashbuckle.AspNetCore.SwaggerUI.dll
+/home/nodariko/Desktop/CSharp/ExadelBookstoreAPI/obj/Debug/net9.0/ExadelBookstoreAPI.sourcelink.json
